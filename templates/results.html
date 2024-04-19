@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Search Results</title>
+    <script>
+        function fetchFigure(compoundName) {
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', '/get_figure/' + encodeURIComponent(compoundName));
+            xhr.responseType = 'blob';  // Expect an image as a blob
+        
+            xhr.onload = function() {
+                if (this.status === 200) {
+                    var img = document.createElement('img');
+                    img.src = URL.createObjectURL(this.response);
+                    img.alt = 'Spectral Data Plot';
+        
+                    // Insert the image under the button, or replace an existing one
+                    var container = document.getElementById(compoundName + '-figure');
+                    container.innerHTML = '';  // Clear previous content
+                    container.appendChild(img);
+                    container.style.display = 'block';  // Ensure container is visible
+                } else {
+                    console.error('Could not retrieve image.');
+                }
+            };
+            xhr.send();
+        }
+        </script>
+    <script>
+        function predictMeltingPoint(compoundName) {
+            fetch(`/predict_melting_point/${encodeURIComponent(compoundName)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if(data.error) {
+                        alert('Error: ' + data.error);
+                    } else {
+                        alert(`${compoundName} predicted melting point: ${data.melting_point}`);
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+        </script>
+</head>
+
+<body>
+    <h1>Results for "{{ query }}"</h1>
+    {% if results %}
+        <ul>
+            {% for name, properties in results.items() %}
+                <li>
+                    <h2>{{ name }}</h2>
+                    <p>PubChem CID: {{ properties.pubchem_cid }}</p>
+                    <p>Melting Point: {{ properties.melting_point }}</p>
+                    <p>Other Properties: {{ properties.other_property }}</p>
+                    <p>Spectral Data: {{ properties.spectral }}</p>
+                    <button onclick="fetchFigure('{{ name }}')">Show Spectral Data Plot</button>
+                    <div id="{{ name }}-figure" style="display:none;"></div>                    
+                    <button onclick="predictMeltingPoint('{{ name }}')">Predict Melting Point</button>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No results found.</p>
+    {% endif %}
+    <a href="/">Back to search</a>
+</body>
+</html>

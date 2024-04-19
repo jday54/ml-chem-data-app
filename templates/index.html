@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Spectral Database Query</title>
+</head>
+<body>
+    <h1>Query the Spectral Database</h1>
+    <form action="/search" method="post">
+        <input type="text" name="query" placeholder="Enter compound name or PubChem CID">
+        <input type="number" name="min_mp" placeholder="Min melting point -inf">
+        <input type="number" name="max_mp" placeholder="Max melting point +inf">
+        <div>
+            <input type="checkbox" id="has_mp" name="has_mp" value="true">
+            <label for="has_mp">Only show compounds that have recorded melting points</label>
+        </div>    
+        <button type="submit">Search</button>
+    </form>
+</body>
+</html>
